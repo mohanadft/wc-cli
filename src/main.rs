@@ -97,9 +97,9 @@ fn main() {
 
     for (value, fun) in args_iter {
         if value {
-            res += &fun(&content).to_string();
+            res.push_str(&fun(&content).to_string());
 
-            res += " ";
+            res.push_str(" ");
         }
     }
 
