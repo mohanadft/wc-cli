@@ -3,7 +3,7 @@ use std::fs;
 use clap::Parser;
 
 pub fn get_content(file_name: &str) -> String {
-    let a = match fs::read_to_string(&file_name) {
+    let a: String = match fs::read_to_string(&file_name) {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{e:?}");
@@ -82,7 +82,7 @@ impl<'a> Iterator for ArgsIter<'a> {
 }
 
 fn main() {
-    let mut args = Args::parse();
+    let mut args: Args = Args::parse();
 
     if !args.bytes && !args.chars && !args.lines && !args.words {
         args.bytes = true;
@@ -90,10 +90,10 @@ fn main() {
         args.words = true;
     }
 
-    let content = get_content(&args.file_name);
-    let mut res = String::from("");
+    let content: String = get_content(&args.file_name);
+    let mut res: String = String::from("");
 
-    let args_iter = ArgsIter::new(&args);
+    let args_iter: ArgsIter = ArgsIter::new(&args);
 
     for (value, fun) in args_iter {
         if value {
