@@ -6,8 +6,8 @@ pub fn get_content(file_name: &str) -> String {
     let a: String = match fs::read_to_string(&file_name) {
         Ok(v) => v,
         Err(e) => {
-            eprintln!("{e:?}");
-            return "".to_string();
+            eprintln!("{}", e.to_string());
+            std::process::exit(1);
         }
     };
 
