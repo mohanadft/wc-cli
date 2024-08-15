@@ -30,6 +30,14 @@ pub fn words(content: &str) -> usize {
     content.split_whitespace().count()
 }
 
+pub fn max_line_length(content: &str) -> usize {
+    content
+        .lines()
+        .max_by(|x, y| x.len().cmp(&y.len()))
+        .expect("Content is empty, no lines to compare.")
+        .len()
+}
+
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -78,6 +86,7 @@ impl<'a> Iterator for ArgsIter<'a> {
             1 => Some((self.args.chars, chars)),
             2 => Some((self.args.lines, lines)),
             3 => Some((self.args.words, words)),
+            4 => Some((self.args.max_line_length, max_line_length)),
             _ => None,
         };
         self.index += 1;
@@ -88,7 +97,7 @@ impl<'a> Iterator for ArgsIter<'a> {
 fn main() {
     let mut args: Args = Args::parse();
 
-    if !args.bytes && !args.chars && !args.lines && !args.words {
+    if !args.bytes && !args.chars && !args.lines && !args.words && !args.max_line_length {
         args.bytes = true;
         args.lines = true;
         args.words = true;
