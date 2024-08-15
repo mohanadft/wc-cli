@@ -49,6 +49,10 @@ struct Args {
     #[arg(short, long = "words")]
     words: bool,
 
+    /// print the maximum display width
+    #[arg(short = 'L', long = "max-line-length")]
+    max_line_length: bool,
+
     /// file to be read
     #[arg()]
     file_name: String,
