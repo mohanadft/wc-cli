@@ -42,11 +42,11 @@ struct Args {
     chars: bool,
 
     /// print the lines counts
-    #[arg(short = 'l', long = "lines")]
+    #[arg(short, long = "lines")]
     lines: bool,
 
     /// print the words counts
-    #[arg(short = 'w', long = "words")]
+    #[arg(short, long = "words")]
     words: bool,
 
     /// file to be read
