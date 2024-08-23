@@ -39,7 +39,10 @@ pub fn max_line_length(content: &str) -> usize {
 }
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(version, about, author)]
+#[command(
+    help_template = "{author-with-newline}{about-section}Version: {version} \n{usage-heading} {usage} \n{all-args}"
+)]
 struct Args {
     /// print the byte counts
     #[arg(short = 'c', long = "bytes")]
