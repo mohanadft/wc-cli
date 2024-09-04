@@ -31,11 +31,14 @@ pub fn words(content: &str) -> usize {
 }
 
 pub fn max_line_length(content: &str) -> usize {
-    content
-        .lines()
-        .max_by(|x, y| x.len().cmp(&y.len()))
-        .expect("Content is empty, no lines to compare.")
-        .len()
+    match content.lines().max_by(|x, y| x.len().cmp(&y.len())) {
+        Some(v) => v,
+        None => {
+            eprintln!("Content is empty.");
+            std::process::exit(1);
+        }
+    }
+    .len()
 }
 
 pub fn print_total(total: &Total, args: &Args) {
