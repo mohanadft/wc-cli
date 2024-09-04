@@ -94,7 +94,6 @@ pub struct Args {
     file_name: Vec<String>,
 }
 
-#[derive(Debug)]
 enum Flag {
     Bytes(usize),
     Chars(usize),
@@ -112,7 +111,6 @@ pub struct Total {
     max_line_length: usize,
 }
 
-#[derive(Debug)]
 struct File<'a> {
     name: &'a str,
     flags: Vec<Flag>,
