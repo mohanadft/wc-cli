@@ -159,7 +159,16 @@ impl<'a> Iterator for ArgsIter<'a> {
 fn main() {
     let mut args: Args = Args::parse();
 
-    if !args.bytes && !args.chars && !args.lines && !args.words && !args.max_line_length {
+    if [
+        args.bytes,
+        args.chars,
+        args.lines,
+        args.words,
+        args.max_line_length,
+    ]
+    .iter()
+    .all(|v| !v)
+    {
         args.bytes = true;
         args.lines = true;
         args.words = true;
