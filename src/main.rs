@@ -38,12 +38,34 @@ pub fn max_line_length(content: &str) -> usize {
         .len()
 }
 
+pub fn print_total(total: &Total, args: &Args) {
+    let totals: Vec<(bool, usize)> = vec![
+        (args.bytes, total.bytes),
+        (args.chars, total.chars),
+        (args.lines, total.lines),
+        (args.words, total.words),
+        (args.max_line_length, total.max_line_length),
+    ];
+
+    for (found, value) in totals {
+        if found {
+            print!(
+                "{:value_width$} ",
+                value,
+                value_width = value.to_string().len()
+            );
+        }
+    }
+
+    println!("total");
+}
+
 #[derive(Parser, Debug)]
 #[command(version, about, author)]
 #[command(
     help_template = "{author-with-newline}{about-section}Version: {version} \n{usage-heading} {usage} \n{all-args}"
 )]
-struct Args {
+pub struct Args {
     /// print the byte counts
     #[arg(short = 'c', long = "bytes")]
     bytes: bool,
@@ -64,11 +86,44 @@ struct Args {
     #[arg(short = 'L', long = "max-line-length")]
     max_line_length: bool,
 
-    /// file to be read
+    /// files to be read
     #[arg()]
-    file_name: String,
+    file_name: Vec<String>,
 }
 
+#[derive(Debug)]
+enum Flag {
+    Bytes(usize),
+    Chars(usize),
+    Lines(usize),
+    Words(usize),
+    MaxLineLength(usize),
+}
+
+#[derive(Default)]
+pub struct Total {
+    bytes: usize,
+    chars: usize,
+    lines: usize,
+    words: usize,
+    max_line_length: usize,
+}
+
+#[derive(Debug)]
+struct File<'a> {
+    name: &'a str,
+    flags: Vec<Flag>,
+}
+
+impl<'a> File<'a> {
+    fn new(name: &'a str) -> Self {
+        Self {
+            name,
+            flags: Vec::new(),
+        }
+    }
+}
+#[derive(Clone, Copy)]
 struct ArgsIter<'a> {
     args: &'a Args,
     index: usize,
@@ -81,15 +136,19 @@ impl<'a> ArgsIter<'a> {
 }
 
 impl<'a> Iterator for ArgsIter<'a> {
-    type Item = (bool, fn(&'a str) -> usize);
+    type Item = (fn(usize) -> Flag, bool, fn(&'a str) -> usize);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let result: Option<(bool, fn(&str) -> usize)> = match self.index {
-            0 => Some((self.args.bytes, bytes)),
-            1 => Some((self.args.chars, chars)),
-            2 => Some((self.args.lines, lines)),
-            3 => Some((self.args.words, words)),
-            4 => Some((self.args.max_line_length, max_line_length)),
+        let result: Option<(fn(usize) -> Flag, bool, fn(&str) -> usize)> = match self.index {
+            0 => Some((Flag::Bytes, self.args.bytes, bytes)),
+            1 => Some((Flag::Chars, self.args.chars, chars)),
+            2 => Some((Flag::Lines, self.args.lines, lines)),
+            3 => Some((Flag::Words, self.args.words, words)),
+            4 => Some((
+                Flag::MaxLineLength,
+                self.args.max_line_length,
+                max_line_length,
+            )),
             _ => None,
         };
         self.index += 1;
@@ -106,18 +165,74 @@ fn main() {
         args.words = true;
     }
 
-    let content: String = get_content(&args.file_name);
-    let mut res: String = String::from("");
-
     let args_iter: ArgsIter = ArgsIter::new(&args);
 
-    for (value, fun) in args_iter {
-        if value {
-            res.push_str(&fun(&content).to_string());
+    let mut files: Vec<File> = Vec::new();
 
-            res.push_str(" ");
+    let mut total = Total::default();
+
+    for file in &args.file_name {
+        let mut new_file = File::new(file);
+        let content: String = get_content(new_file.name);
+
+        for (enm, found, fun) in args_iter {
+            if found {
+                let val = enm(fun(&content));
+
+                match val {
+                    Flag::Bytes(m) => total.bytes += m,
+                    Flag::Chars(c) => total.chars += c,
+                    Flag::Lines(l) => total.lines += l,
+                    Flag::Words(w) => total.words += w,
+                    Flag::MaxLineLength(mx) => total.max_line_length += mx,
+                }
+
+                new_file.flags.push(val);
+            }
         }
+
+        files.push(new_file);
     }
 
-    println!("{}{}", res, args.file_name);
+    for file in &files {
+        for flag in &file.flags {
+            match flag {
+                Flag::Bytes(m) => print!(
+                    "{:>total_bytes$} ",
+                    m,
+                    total_bytes = total.bytes.to_string().len()
+                ),
+                Flag::Chars(c) => print!(
+                    "{:>total_chars$} ",
+                    c,
+                    total_chars = total.chars.to_string().len()
+                ),
+                Flag::Lines(l) => print!(
+                    "{:>total_lines$} ",
+                    l,
+                    total_lines = total.lines.to_string().len()
+                ),
+                Flag::Words(w) => print!(
+                    "{:>total_words$} ",
+                    w,
+                    total_words = total.words.to_string().len()
+                ),
+                Flag::MaxLineLength(mx) => {
+                    print!(
+                        "{:>total_max_line$} ",
+                        mx,
+                        total_max_line = total.max_line_length.to_string().len()
+                    )
+                }
+            }
+        }
+
+        print!("{}", file.name);
+
+        println!();
+    }
+
+    if files.len() > 1 {
+        print_total(&total, &args);
+    }
 }
