@@ -63,10 +63,10 @@ pub fn print_total(total: &Total, args: &Args) {
     println!("total");
 }
 
-#[derive(Parser, Debug)]
+#[derive(Parser)]
 #[command(version, about, author)]
 #[command(
-    help_template = "{author-with-newline}{about-section}Version: {version} \n{usage-heading} {usage} \n{all-args}"
+    help_template = "Author: {author-with-newline}{about-section}Version: {version} \n{usage-heading} {usage} \n{all-args}"
 )]
 pub struct Args {
     /// print the byte counts
