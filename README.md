@@ -9,7 +9,7 @@ This project is inspired by Unix's wc command, and it's here to help you count w
 - [x] Word Count (-w): Get the word count with precision.
 - [x] Character Count (-c): How many characters are in your file? Find out!
 - [x] Longest Line (-L): Measure the length of the longest line for optimized file reading.
-- [x] Bytes Count (-m): Count the number if bytes in a file.
+- [x] Bytes Count (-m): Count the number of bytes in a file.
 
 ## 📦 Installation
 
