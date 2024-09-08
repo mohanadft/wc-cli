@@ -63,7 +63,7 @@ pub fn print_total(total: &Total, args: &Args) {
     println!("total");
 }
 
-pub fn read_from_io(args: &Args) {
+pub fn read_from_standard_input(args: &Args) {
     let args_iter2: ArgsIter = ArgsIter::new(&args);
 
     let content = match std::io::read_to_string(io::stdin()) {
@@ -244,7 +244,7 @@ fn main() {
     let mut total = Total::default();
 
     if args.file_name.len() == 0 {
-        read_from_io(&args);
+        read_from_standard_input(&args);
     }
 
     for file in &args.file_name {
