@@ -150,6 +150,41 @@ impl<'a> File<'a> {
             flags: Vec::new(),
         }
     }
+
+    fn print_flags(&self, total: &Total) {
+        for flag in &self.flags {
+            match flag {
+                Flag::Bytes(m) => print!(
+                    "{:>total_bytes$} ",
+                    m,
+                    total_bytes = total.bytes.to_string().len()
+                ),
+                Flag::Chars(c) => print!(
+                    "{:>total_chars$} ",
+                    c,
+                    total_chars = total.chars.to_string().len()
+                ),
+                Flag::Lines(l) => print!(
+                    "{:>total_lines$} ",
+                    l,
+                    total_lines = total.lines.to_string().len()
+                ),
+                Flag::Words(w) => print!(
+                    "{:>total_words$} ",
+                    w,
+                    total_words = total.words.to_string().len()
+                ),
+                Flag::MaxLineLength(mx) => {
+                    print!(
+                        "{:>total_max_line$} ",
+                        mx,
+                        total_max_line = total.max_line_length.to_string().len()
+                    )
+                }
+            }
+        }
+        print!("{}", self.name);
+    }
 }
 #[derive(Clone, Copy)]
 struct ArgsIter<'a> {
@@ -236,40 +271,7 @@ fn main() {
     }
 
     for file in &files {
-        for flag in &file.flags {
-            match flag {
-                Flag::Bytes(m) => print!(
-                    "{:>total_bytes$} ",
-                    m,
-                    total_bytes = total.bytes.to_string().len()
-                ),
-                Flag::Chars(c) => print!(
-                    "{:>total_chars$} ",
-                    c,
-                    total_chars = total.chars.to_string().len()
-                ),
-                Flag::Lines(l) => print!(
-                    "{:>total_lines$} ",
-                    l,
-                    total_lines = total.lines.to_string().len()
-                ),
-                Flag::Words(w) => print!(
-                    "{:>total_words$} ",
-                    w,
-                    total_words = total.words.to_string().len()
-                ),
-                Flag::MaxLineLength(mx) => {
-                    print!(
-                        "{:>total_max_line$} ",
-                        mx,
-                        total_max_line = total.max_line_length.to_string().len()
-                    )
-                }
-            }
-        }
-
-        print!("{}", file.name);
-
+        file.print_flags(&total);
         println!();
     }
 
