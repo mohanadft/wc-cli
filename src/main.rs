@@ -1,4 +1,4 @@
-use std::{fs, io};
+use std::{fmt::Display, fs, io};
 
 use clap::Parser;
 
@@ -52,11 +52,7 @@ pub fn print_total(total: &Total, args: &Args) {
 
     for (found, value) in totals {
         if found {
-            print!(
-                "{:value_width$} ",
-                value,
-                value_width = value.to_string().len()
-            );
+            print!("{} ", value);
         }
     }
 
@@ -78,16 +74,18 @@ pub fn read_from_standard_input(args: &Args) {
             let val = enm(fun(&content));
 
             match val {
-                Flag::Bytes(m) => print!("{:>val_width$} ", m, val_width = m.to_string().len()),
-                Flag::Chars(c) => print!("{:>val_width$} ", c, val_width = c.to_string().len()),
-                Flag::Lines(l) => print!("{:>val_width$} ", l, val_width = l.to_string().len()),
-                Flag::Words(w) => print!("{:>val_width$} ", w, val_width = w.to_string().len()),
-                Flag::MaxLineLength(mx) => {
-                    print!("{:>val_width$} ", mx, val_width = mx.to_string().len())
-                }
+                Flag::Bytes(m) => print_with_width(m, m.to_string().len()),
+                Flag::Chars(c) => print_with_width(c, c.to_string().len()),
+                Flag::Lines(l) => print_with_width(l, l.to_string().len()),
+                Flag::Words(w) => print_with_width(w, w.to_string().len()),
+                Flag::MaxLineLength(mx) => print_with_width(mx, mx.to_string().len()),
             }
         }
     }
+}
+
+pub fn print_with_width<T: Display>(val: T, width: usize) {
+    print!("{:>width$} ", val, width = width)
 }
 
 #[derive(Parser)]
@@ -154,32 +152,12 @@ impl<'a> File<'a> {
     fn print_flags(&self, total: &Total) {
         for flag in &self.flags {
             match flag {
-                Flag::Bytes(m) => print!(
-                    "{:>total_bytes$} ",
-                    m,
-                    total_bytes = total.bytes.to_string().len()
-                ),
-                Flag::Chars(c) => print!(
-                    "{:>total_chars$} ",
-                    c,
-                    total_chars = total.chars.to_string().len()
-                ),
-                Flag::Lines(l) => print!(
-                    "{:>total_lines$} ",
-                    l,
-                    total_lines = total.lines.to_string().len()
-                ),
-                Flag::Words(w) => print!(
-                    "{:>total_words$} ",
-                    w,
-                    total_words = total.words.to_string().len()
-                ),
+                Flag::Bytes(m) => print_with_width(m, total.bytes.to_string().len()),
+                Flag::Chars(c) => print_with_width(c, total.chars.to_string().len()),
+                Flag::Lines(l) => print_with_width(l, total.lines.to_string().len()),
+                Flag::Words(w) => print_with_width(w, total.words.to_string().len()),
                 Flag::MaxLineLength(mx) => {
-                    print!(
-                        "{:>total_max_line$} ",
-                        mx,
-                        total_max_line = total.max_line_length.to_string().len()
-                    )
+                    print_with_width(mx, total.max_line_length.to_string().len())
                 }
             }
         }
