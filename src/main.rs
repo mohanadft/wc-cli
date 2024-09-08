@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, io};
 
 use clap::Parser;
 
@@ -61,6 +61,33 @@ pub fn print_total(total: &Total, args: &Args) {
     }
 
     println!("total");
+}
+
+pub fn read_from_io(args: &Args) {
+    let args_iter2: ArgsIter = ArgsIter::new(&args);
+
+    let content = match std::io::read_to_string(io::stdin()) {
+        Ok(v) => v,
+        Err(_) => {
+            std::process::exit(1);
+        }
+    };
+
+    for (enm, found, fun) in args_iter2 {
+        if found {
+            let val = enm(fun(&content));
+
+            match val {
+                Flag::Bytes(m) => print!("{:>val_width$} ", m, val_width = m.to_string().len()),
+                Flag::Chars(c) => print!("{:>val_width$} ", c, val_width = c.to_string().len()),
+                Flag::Lines(l) => print!("{:>val_width$} ", l, val_width = l.to_string().len()),
+                Flag::Words(w) => print!("{:>val_width$} ", w, val_width = w.to_string().len()),
+                Flag::MaxLineLength(mx) => {
+                    print!("{:>val_width$} ", mx, val_width = mx.to_string().len())
+                }
+            }
+        }
+    }
 }
 
 #[derive(Parser)]
@@ -180,6 +207,10 @@ fn main() {
     let mut files: Vec<File> = Vec::new();
 
     let mut total = Total::default();
+
+    if args.file_name.len() == 0 {
+        read_from_io(&args);
+    }
 
     for file in &args.file_name {
         let mut new_file = File::new(file);
