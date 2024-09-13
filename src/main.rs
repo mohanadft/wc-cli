@@ -1,6 +1,6 @@
 use std::{fmt::Display, fs, io};
 
-use clap::Parser;
+use clap::{builder::Str, Parser};
 
 pub fn get_content(file_name: &str) -> String {
     let a: String = match fs::read_to_string(&file_name) {
@@ -136,13 +136,13 @@ pub struct Total {
     max_line_length: usize,
 }
 
-struct File<'a> {
-    name: &'a str,
+struct File {
+    name: String,
     flags: Vec<Flag>,
 }
 
-impl<'a> File<'a> {
-    fn new(name: &'a str) -> Self {
+impl File {
+    fn new(name: String) -> Self {
         Self {
             name,
             flags: Vec::new(),
@@ -226,8 +226,8 @@ fn main() {
     }
 
     for file in &args.file_name {
-        let mut new_file = File::new(file);
-        let content: String = get_content(new_file.name);
+        let mut new_file = File::new(file.to_string());
+        let content: String = get_content(&new_file.name);
 
         for (enm, found, fun) in args_iter {
             if found {
