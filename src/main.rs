@@ -1,8 +1,8 @@
 use std::{fmt::Display, fs, io};
 
-use clap::{builder::Str, Parser};
+use clap::Parser;
 
-pub fn get_content(file_name: &str) -> String {
+pub fn get_content(file_name: String) -> String {
     let a: String = match fs::read_to_string(&file_name) {
         Ok(v) => v,
         Err(e) => {
@@ -14,23 +14,23 @@ pub fn get_content(file_name: &str) -> String {
     return a;
 }
 
-pub fn bytes(content: &str) -> usize {
+pub fn bytes(content: String) -> usize {
     content.as_bytes().len()
 }
 
-pub fn lines(content: &str) -> usize {
+pub fn lines(content: String) -> usize {
     content.lines().count()
 }
 
-pub fn chars(content: &str) -> usize {
+pub fn chars(content: String) -> usize {
     content.chars().count()
 }
 
-pub fn words(content: &str) -> usize {
+pub fn words(content: String) -> usize {
     content.split_whitespace().count()
 }
 
-pub fn max_line_length(content: &str) -> usize {
+pub fn max_line_length(content: String) -> usize {
     match content.lines().max_by(|x, y| x.len().cmp(&y.len())) {
         Some(v) => v,
         None => {
@@ -71,7 +71,7 @@ pub fn read_from_standard_input(args: &Args) {
 
     for (enm, found, fun) in args_iter2 {
         if found {
-            let val = enm(fun(&content));
+            let val = enm(fun(content.clone()));
 
             match val {
                 Flag::Bytes(m) => print_with_width(m, m.to_string().len()),
@@ -136,13 +136,13 @@ pub struct Total {
     max_line_length: usize,
 }
 
-struct File {
-    name: String,
+struct File<'a> {
+    name: &'a str,
     flags: Vec<Flag>,
 }
 
-impl File {
-    fn new(name: String) -> Self {
+impl<'a> File<'a> {
+    fn new(name: &'a str) -> Self {
         Self {
             name,
             flags: Vec::new(),
@@ -177,10 +177,10 @@ impl<'a> ArgsIter<'a> {
 }
 
 impl<'a> Iterator for ArgsIter<'a> {
-    type Item = (fn(usize) -> Flag, bool, fn(&'a str) -> usize);
+    type Item = (fn(usize) -> Flag, bool, fn(String) -> usize);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let result: Option<(fn(usize) -> Flag, bool, fn(&str) -> usize)> = match self.index {
+        let result: Option<(fn(usize) -> Flag, bool, fn(String) -> usize)> = match self.index {
             0 => Some((Flag::Bytes, self.args.bytes, bytes)),
             1 => Some((Flag::Chars, self.args.chars, chars)),
             2 => Some((Flag::Lines, self.args.lines, lines)),
@@ -226,12 +226,12 @@ fn main() {
     }
 
     for file in &args.file_name {
-        let mut new_file = File::new(file.to_string());
-        let content: String = get_content(&new_file.name);
+        let mut new_file = File::new(file);
+        let content: String = get_content(new_file.name.to_owned());
 
         for (enm, found, fun) in args_iter {
             if found {
-                let val = enm(fun(&content));
+                let val = enm(fun(content.clone()));
 
                 match val {
                     Flag::Bytes(m) => total.bytes += m,
