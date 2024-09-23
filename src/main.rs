@@ -14,23 +14,23 @@ pub fn get_content(file_name: String) -> String {
     return a;
 }
 
-pub fn bytes(content: String) -> usize {
+pub fn bytes(content: &str) -> usize {
     content.as_bytes().len()
 }
 
-pub fn lines(content: String) -> usize {
+pub fn lines(content: &str) -> usize {
     content.lines().count()
 }
 
-pub fn chars(content: String) -> usize {
+pub fn chars(content: &str) -> usize {
     content.chars().count()
 }
 
-pub fn words(content: String) -> usize {
+pub fn words(content: &str) -> usize {
     content.split_whitespace().count()
 }
 
-pub fn max_line_length(content: String) -> usize {
+pub fn max_line_length(content: &str) -> usize {
     match content.lines().max_by(|x, y| x.len().cmp(&y.len())) {
         Some(v) => v,
         None => {
@@ -71,7 +71,7 @@ pub fn read_from_standard_input(args: &Args) {
 
     for (enm, found, fun) in args_iter2 {
         if found {
-            let val = enm(fun(content.clone()));
+            let val = enm(fun(&content));
 
             match val {
                 Flag::Bytes(m) => print_with_width(m, m.to_string().len()),
@@ -181,10 +181,10 @@ impl<'a> ArgsIter<'a> {
 }
 
 impl<'a> Iterator for ArgsIter<'a> {
-    type Item = (fn(usize) -> Flag, bool, fn(String) -> usize);
+    type Item = (fn(usize) -> Flag, bool, fn(&str) -> usize);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let result: Option<(fn(usize) -> Flag, bool, fn(String) -> usize)> = match self.index {
+        let result: Option<(fn(usize) -> Flag, bool, fn(&str) -> usize)> = match self.index {
             0 => Some((Flag::Bytes, self.args.bytes, bytes)),
             1 => Some((Flag::Chars, self.args.chars, chars)),
             2 => Some((Flag::Lines, self.args.lines, lines)),
@@ -235,7 +235,7 @@ fn main() {
 
         for (enm, found, fun) in args_iter {
             if found {
-                let val = enm(fun(content.clone()));
+                let val = enm(fun(&content));
 
                 match val {
                     Flag::Bytes(m) => total.bytes += m,
@@ -257,7 +257,7 @@ fn main() {
         println!();
     }
 
-    if files.len() > 1 && ["auto", "always"].iter().cloned().any(|v| args.total == v) {
+    if files.len() > 1 && ["auto", "always"].iter().any(|v| args.total == *v) {
         print_total(&total, &args);
     }
 }
