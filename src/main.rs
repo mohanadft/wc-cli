@@ -257,7 +257,7 @@ fn main() {
         println!();
     }
 
-    if files.len() > 1 && ["auto", "always"].iter().any(|v| args.total == *v) {
+    if files.len() > 1 && ["auto", "always"].iter().cloned().any(|v| args.total == v) {
         print_total(&total, &args);
     }
 }
