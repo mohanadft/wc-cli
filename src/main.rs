@@ -114,6 +114,10 @@ pub struct Args {
     #[arg(short = 'L', long = "max-line-length")]
     max_line_length: bool,
 
+    /// when to print a line with total counts;
+    #[arg(long, default_value = "always", default_value_t = String::from("always"), value_parser=["auto", "always", "never", "only"])]
+    total: String,
+
     /// files to be read
     #[arg()]
     file_name: Vec<String>,
@@ -253,7 +257,7 @@ fn main() {
         println!();
     }
 
-    if files.len() > 1 {
+    if files.len() > 1 && ["auto", "always"].iter().any(|v| args.total == *v) {
         print_total(&total, &args);
     }
 }
