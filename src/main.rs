@@ -1,17 +1,13 @@
-use std::{fmt::Display, fs, io};
+use std::{
+    fmt::Display,
+    fs,
+    io::{self, Error},
+};
 
 use clap::Parser;
 
-pub fn get_content(file_name: String) -> String {
-    let a: String = match fs::read_to_string(&file_name) {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("{}", e.to_string());
-            std::process::exit(1);
-        }
-    };
-
-    return a;
+pub fn get_content(file_name: &str) -> Result<String, io::Error> {
+    fs::read_to_string(&file_name)
 }
 
 pub fn bytes(content: &str) -> usize {
@@ -201,7 +197,7 @@ impl<'a> Iterator for ArgsIter<'a> {
     }
 }
 
-fn main() {
+fn main() -> Result<(), io::Error> {
     let mut args: Args = Args::parse();
 
     if [
@@ -225,13 +221,14 @@ fn main() {
 
     let mut total = Total::default();
 
-    if args.file_name.len() == 0 {
+    if args.file_name.is_empty() {
         read_from_standard_input(&args);
+        return Ok(());
     }
 
     for file in &args.file_name {
         let mut new_file = File::new(file);
-        let content: String = get_content(new_file.name.to_owned());
+        let content: String = get_content(new_file.name)?;
 
         for (enm, found, fun) in args_iter {
             if found {
@@ -260,4 +257,6 @@ fn main() {
     if files.len() > 1 && ["auto", "always"].iter().any(|v| args.total == *v) {
         print_total(&total, &args);
     }
+
+    Ok(())
 }
