@@ -1,8 +1,4 @@
-use std::{
-    fmt::Display,
-    fs,
-    io::{self, Error},
-};
+use std::{fmt::Display, fs, io};
 
 use clap::Parser;
 
