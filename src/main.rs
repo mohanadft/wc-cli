@@ -224,7 +224,15 @@ fn main() -> Result<(), io::Error> {
 
     for file in &args.file_name {
         let mut new_file = File::new(file);
-        let content: String = get_content(new_file.name)?;
+        let content: String = match get_content(new_file.name) {
+            Ok(v) => v,
+            Err(e) => {
+                return Err(io::Error::new(
+                    e.kind(),
+                    format!("Error processing file {}: {}", new_file.name, e),
+                ));
+            }
+        };
 
         for (enm, found, fun) in args_iter {
             if found {
