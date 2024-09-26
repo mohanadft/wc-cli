@@ -258,7 +258,7 @@ fn main() -> Result<(), io::Error> {
         println!();
     }
 
-    if files.len() > 1 && ["auto", "always"].iter().any(|v| args.total == *v) {
+    if (files.len() > 1 && args.total == "auto") || (files.len() >= 1 && args.total == "always") {
         print_total(&total, &args);
     }
 
