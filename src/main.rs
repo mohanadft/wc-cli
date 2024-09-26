@@ -2,16 +2,8 @@ use std::{fmt::Display, fs, io};
 
 use clap::Parser;
 
-pub fn get_content(file_name: &str) -> String {
-    let a: String = match fs::read_to_string(&file_name) {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("{}", e.to_string());
-            std::process::exit(1);
-        }
-    };
-
-    return a;
+pub fn get_content(file_name: &str) -> Result<String, io::Error> {
+    fs::read_to_string(&file_name)
 }
 
 pub fn bytes(content: &str) -> usize {
@@ -114,6 +106,10 @@ pub struct Args {
     #[arg(short = 'L', long = "max-line-length")]
     max_line_length: bool,
 
+    /// when to print a line with total counts;
+    #[arg(long, default_value = "always", default_value_t = String::from("always"), value_parser=["auto", "always", "never"])]
+    total: String,
+
     /// files to be read
     #[arg()]
     file_name: Vec<String>,
@@ -177,7 +173,7 @@ impl<'a> ArgsIter<'a> {
 }
 
 impl<'a> Iterator for ArgsIter<'a> {
-    type Item = (fn(usize) -> Flag, bool, fn(&'a str) -> usize);
+    type Item = (fn(usize) -> Flag, bool, fn(&str) -> usize);
 
     fn next(&mut self) -> Option<Self::Item> {
         let result: Option<(fn(usize) -> Flag, bool, fn(&str) -> usize)> = match self.index {
@@ -197,7 +193,7 @@ impl<'a> Iterator for ArgsIter<'a> {
     }
 }
 
-fn main() {
+fn main() -> Result<(), io::Error> {
     let mut args: Args = Args::parse();
 
     if [
@@ -221,13 +217,22 @@ fn main() {
 
     let mut total = Total::default();
 
-    if args.file_name.len() == 0 {
+    if args.file_name.is_empty() {
         read_from_standard_input(&args);
+        return Ok(());
     }
 
     for file in &args.file_name {
         let mut new_file = File::new(file);
-        let content: String = get_content(new_file.name);
+        let content: String = match get_content(new_file.name) {
+            Ok(v) => v,
+            Err(e) => {
+                return Err(io::Error::new(
+                    e.kind(),
+                    format!("Error processing file {}: {}", new_file.name, e),
+                ));
+            }
+        };
 
         for (enm, found, fun) in args_iter {
             if found {
@@ -253,7 +258,9 @@ fn main() {
         println!();
     }
 
-    if files.len() > 1 {
+    if (files.len() > 1 && args.total == "auto") || (files.len() >= 1 && args.total == "always") {
         print_total(&total, &args);
     }
+
+    Ok(())
 }
