@@ -107,7 +107,7 @@ pub struct Args {
     max_line_length: bool,
 
     /// when to print a line with total counts;
-    #[arg(long, default_value = "always", default_value_t = String::from("always"), value_parser=["auto", "always", "never", "only"])]
+    #[arg(long, default_value = "always", default_value_t = String::from("always"), value_parser=["auto", "always", "never"])]
     total: String,
 
     /// files to be read
