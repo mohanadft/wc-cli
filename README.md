@@ -10,7 +10,7 @@ This project is inspired by Unix's wc command, and it's here to help you count w
 - [x] Character Count (-c): How many characters are in your file? Find out!
 - [x] Longest Line (-L): Measure the length of the longest line for optimized file reading.
 - [x] Bytes Count (-m): Count the number of bytes in a file.
-- [ ] Total (--total): Show total counts across multiple files with always, never, or auto modes.
+- [x] Total (--total): Show total counts across multiple files with always, never, or auto modes.
 
 ## 📦 Installation
 
