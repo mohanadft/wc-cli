@@ -5,12 +5,12 @@ This project is inspired by Unix's wc command, and it's here to help you count w
 
 ## 🚀 Features
 
-- [x] Line Count (-l): Count the number of lines in a file.
-- [x] Word Count (-w): Get the word count with precision.
-- [x] Character Count (-c): How many characters are in your file? Find out!
-- [x] Longest Line (-L): Measure the length of the longest line for optimized file reading.
-- [x] Bytes Count (-m): Count the number of bytes in a file.
-- [x] Total (--total): Show total counts across multiple files with always, never, or auto modes.
+- [x] Line Count (`-l`): Count the number of lines in a file.
+- [x] Word Count (`-w`): Get the word count with precision.
+- [x] Character Count (`-c`): How many characters are in your file? Find out!
+- [x] Longest Line (`-L`): Measure the length of the longest line for optimized file reading.
+- [x] Bytes Count (`-m`): Count the number of bytes in a file.
+- [x] Total (`--total`): Show total counts across multiple files with always, never, or auto modes.
 
 ## 📦 Installation
 
